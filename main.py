@@ -147,6 +147,7 @@ generator = make_generator_model()
 # Discriminator
 discriminator = make_discriminator_model()
 
+# Train Step
 @tf.function
 def train_step(images):
     noise = tf.random.normal([BATCH_SIZE, NOISE_DIM])
@@ -161,6 +162,7 @@ def train_step(images):
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
+# Generate images
 def generate_and_save_images(model, epoch, test_input):
     predictions = model(test_input, training=False)
     plt.figure(figsize=(3, 3))
@@ -174,6 +176,7 @@ def generate_and_save_images(model, epoch, test_input):
     plt.savefig(GENERATED_IMAGES_DIR+'/image_at_epoch_{:04d}.png'.format(epoch))
     plt.close()
 
+# Train function
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
