@@ -26,9 +26,7 @@ TRAIN_IMAGES_FOLDER = 'images/training_simple_shapes_color'
 GENERATED_IMAGES_DIR = 'generated_images_triangles_color'
 
 FILE_ENDING = '.png'
-#FILE_ENDING = '.ppm'
 CLASS_NAME_ARRAY = ['1 (Square)' , '2 (Circle)', '3 (Triangle)']
-#CLASS_NAME_ARRAY = ['1 (Right of way)' , '2 (Give way)', '3 (Stop)']
 TRAIN_PATH_TO_FILES_ARRAY = [TRAIN_IMAGES_FOLDER+'/1/', TRAIN_IMAGES_FOLDER+'/2/', TRAIN_IMAGES_FOLDER+'/3/']
 
 SHOW_IMAGES = False
@@ -105,7 +103,7 @@ def make_generator_model():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.Reshape((8, 8, 256)))
-    assert model.output_shape == (None, 8, 8, 256)  # Note: None is the batch size
+    assert model.output_shape == (None, 8, 8, 256)
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     assert model.output_shape == (None, 8, 8, 128)
     model.add(layers.BatchNormalization())
