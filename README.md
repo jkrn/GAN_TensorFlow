@@ -6,7 +6,7 @@ In this project a Generative Adversarial Network (GAN) is implemented with Tenso
 
 The file "main.py" contains the Python source code.
 The training images need to be placed in the folder "images".
-The folder "assets" contains the image shown below.
+The folder "assets" contains the images which are shown below.
 
 ### Overview of the Generative Adversarial Network (GAN)
 
