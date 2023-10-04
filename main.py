@@ -183,11 +183,9 @@ def train(dataset, epochs):
         # Train Steps
         for image_batch in dataset:
             train_step(image_batch)
-        # Produce images for the GIF as you go
         display.clear_output(wait=True)
         generate_and_save_images(generator, epoch + 1, seed)
         print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
-    # Generate after the final epoch
     display.clear_output(wait=True)
     generate_and_save_images(generator,epochs,seed)
 
