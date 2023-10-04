@@ -11,6 +11,7 @@ The folder "assets" contains the image shown below.
 ### Overview of the Generative Adversarial Network (GAN)
 
 This image shows an overview of the Generative Adversarial Network.
+
 ![alt text](https://github.com/jkrn/GAN_TensorFlow/blob/main/assets/GAN.png?raw=true)
 
 ### Example
