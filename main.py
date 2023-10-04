@@ -11,7 +11,7 @@ os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 
 # Constants
-NOISE_DIM = 100
+RANDOM_VECTOR_LENGTH = 100
 NUM_EXAMPLES_TO_GENERATE = 3*3
 NUM_CLASSES = 3
 IMAGE_SIZE = 32
@@ -23,12 +23,10 @@ BUFFER_SIZE = 60000
 BATCH_SIZE = 256
 IMAGE_GENERATION_CLASS_ID = 2
 TRAIN_IMAGES_FOLDER = 'images/training_simple_shapes_color'
-GENERATED_IMAGES_DIR = 'generated_images_triangles_color'
-
+GENERATED_IMAGES_FOLDER = 'generated_images_triangles_color'
 FILE_ENDING = '.png'
 CLASS_NAME_ARRAY = ['1 (Square)' , '2 (Circle)', '3 (Triangle)']
 TRAIN_PATH_TO_FILES_ARRAY = [TRAIN_IMAGES_FOLDER+'/1/', TRAIN_IMAGES_FOLDER+'/2/', TRAIN_IMAGES_FOLDER+'/3/']
-
 SHOW_IMAGES = True
 TRAIN_MODE = True
 
@@ -38,7 +36,7 @@ trainsets_array = []
 generator_optimizer = tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE)
 discriminator_optimizer = tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE)
 # Seed
-seed = tf.random.normal([NUM_EXAMPLES_TO_GENERATE, NOISE_DIM])
+seed = tf.random.normal([NUM_EXAMPLES_TO_GENERATE, RANDOM_VECTOR_LENGTH])
 # Cross Entropy
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
@@ -96,10 +94,10 @@ def show_train_images():
         plt.imshow(img_data)
         plt.show()
 
-# Generator Model
+# Make Generator Model Function
 def make_generator_model():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(8*8*256, use_bias=False, input_shape=(100,)))
+    model.add(layers.Dense(8*8*256, use_bias=False, input_shape=(RANDOM_VECTOR_LENGTH,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.Reshape((8, 8, 256)))
@@ -116,7 +114,10 @@ def make_generator_model():
     assert model.output_shape == (None, 32, 32, 3)
     return model
 
-# Discriminator Model
+# Generator Model
+generator = make_generator_model()
+
+# Make Discriminator Model Function
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same', input_shape=[32, 32, 3]))
@@ -129,6 +130,9 @@ def make_discriminator_model():
     model.add(layers.Dense(1))
     return model
 
+# Discriminator Model
+discriminator = make_discriminator_model()
+
 # Discriminator Loss
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
@@ -140,15 +144,10 @@ def discriminator_loss(real_output, fake_output):
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
-# Generator
-generator = make_generator_model()
-# Discriminator
-discriminator = make_discriminator_model()
-
 # Train Step
 @tf.function
 def train_step(images):
-    noise = tf.random.normal([BATCH_SIZE, NOISE_DIM])
+    noise = tf.random.normal([BATCH_SIZE, RANDOM_VECTOR_LENGTH])
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
         generated_images = generator(noise, training=True)
         real_output = discriminator(images, training=True)
@@ -161,8 +160,8 @@ def train_step(images):
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
 # Generate images
-def generate_and_save_images(model, epoch, test_input):
-    predictions = model(test_input, training=False)
+def generate_and_save_images(model, epoch, input_vector):
+    predictions = model(input_vector, training=False)
     plt.figure(figsize=(3, 3))
     for i in range(predictions.shape[0]):
         plt.subplot(3, 3, i+1)
@@ -171,14 +170,13 @@ def generate_and_save_images(model, epoch, test_input):
         img_data = img_data.astype(int)
         plt.imshow(img_data)
         plt.axis('off')
-    plt.savefig(GENERATED_IMAGES_DIR+'/image_at_epoch_{:04d}.png'.format(epoch))
+    plt.savefig(GENERATED_IMAGES_FOLDER+'/epoch_{:04d}.png'.format(epoch))
     plt.close()
 
 # Train function
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
-        # Train Steps
         for image_batch in dataset:
             train_step(image_batch)
         display.clear_output(wait=True)
