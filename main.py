@@ -105,7 +105,7 @@ def make_generator_model():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.Reshape((8, 8, 256)))
-    assert model.output_shape == (None, 16, 16, 256)  # Note: None is the batch size
+    assert model.output_shape == (None, 8, 8, 256)  # Note: None is the batch size
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     assert model.output_shape == (None, 8, 8, 128)
     model.add(layers.BatchNormalization())
